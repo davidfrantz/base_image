@@ -47,7 +47,8 @@ RUN echo 'alias python=python3' >> ~/.bashrc \
   && echo 'alias pip=pip3' >> ~/.bashrc \
   && . ~/.bashrc
 # NumPy is needed for OpenCV, gsutil for Google downloads
-RUN pip3 install numpy==1.18.1 gsutil
+RUN pip3 install numpy==1.18.1
+RUN pip3 install gsutil
 
 # Build OpenCV from source
 RUN mkdir -p $INSTALL_DIR/opencv
