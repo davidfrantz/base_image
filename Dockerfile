@@ -77,7 +77,7 @@ RUN ./configure CPPFLAGS="-I /usr/include/gdal" CXXFLAGS=-fpermissive \
 RUN rm -rf $INSTALL_DIR
 RUN apt-get purge -y --auto-remove apt-utils cmake git build-essential software-properties-common
 
-# Create a dedicated 'docker' group and user for running FORCE commands
+# Create a dedicated 'docker' group and user
 RUN groupadd docker && \
   useradd -m docker -g docker -p docker && \
   chgrp docker /usr/local/bin
