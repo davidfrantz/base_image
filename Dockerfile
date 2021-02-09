@@ -76,7 +76,7 @@ RUN ./configure CPPFLAGS="-I /usr/include/gdal" CXXFLAGS=-fpermissive \
 
 # Cleanup after successfull builds
 RUN rm -rf $INSTALL_DIR
-RUN apt-get purge -y --auto-remove apt-utils cmake git build-essential software-properties-common
+#RUN apt-get purge -y --auto-remove apt-utils cmake git build-essential software-properties-common
 
 # Create a dedicated 'docker' group and user
 RUN groupadd docker && \
