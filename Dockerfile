@@ -2,6 +2,7 @@
 
 # Copyright (C) 2020-2021 Gergely Padányi-Gulyás (github user fegyi001),
 #                         David Frantz
+#                         Fabian Lehmann
 
 FROM ubuntu:18.04 as builder
 
@@ -82,8 +83,12 @@ rm -rf $INSTALL_DIR
 # Create a dedicated 'docker' group and user
 RUN groupadd docker && \
   useradd -m docker -g docker -p docker && \
-  chgrp docker /usr/local/bin
+  chgrp docker /usr/local/bin && \
+  mkdir /home/docker/bin && chown docker /home/docker/bin
 # Use this user by default
 USER docker
+
+ENV HOME /home/docker
+ENV PATH "$PATH:/home/docker/bin"
 
 WORKDIR /home/docker
