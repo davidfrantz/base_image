@@ -84,7 +84,7 @@ rm -rf $INSTALL_DIR
 RUN groupadd docker && \
   useradd -m docker -g docker -p docker && \
   chgrp docker /usr/local/bin && \
-  mkdir /home/docker/bin && chown docker /home/docker/bin
+  mkdir -p /home/docker/bin && chown docker /home/docker/bin
 # Use this user by default
 USER docker
 
