@@ -6,6 +6,9 @@
 
 FROM ubuntu:18.04 as builder
 
+# disable interactive frontends
+ENV DEBIAN_FRONTEND=noninteractive 
+
 # Refresh package list & upgrade existing packages 
 RUN apt-get -y update && apt-get -y upgrade && \ 
 #
