@@ -43,6 +43,7 @@ apt-get -y install \
   libswscale-dev \
   python3.8 \
   python3-pip \
+  pandoc \
   r-base && \
 #
 # Set python aliases for Python 3.x
@@ -52,6 +53,13 @@ echo 'alias python=python3' >> ~/.bashrc \
 # NumPy is needed for OpenCV, gsutil for Google downloads
 pip3 install --no-cache-dir --upgrade pip && \
 pip3 install --no-cache-dir numpy==1.18.1 gsutil && \
+#
+# Install R packages
+Rscript -e 'install.packages("rmarkdown", repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("plotly",    repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("stringi",   repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("knitr",     repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("dplyr",     repos="https://cloud.r-project.org")' && \
 #
 # Clear installation data
 apt-get clean && rm -r /var/cache/
