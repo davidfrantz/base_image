@@ -9,8 +9,10 @@ FROM ubuntu:18.04 as builder
 # Refresh package list & upgrade existing packages 
 RUN apt-get -y update && apt-get -y upgrade && \ 
 #
-# Add PPA for Python 3.x
-apt -y install software-properties-common && \
+# Add PPA for Python 3.x and R 4.0
+apt -y install software-properties-common dirmngr && \
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 && \
+add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -sc)-cran40/" && \
 add-apt-repository -y ppa:deadsnakes/ppa && \
 #
 # Install libraries
@@ -38,6 +40,7 @@ apt-get -y install \
   libswscale-dev \
   python3.8 \
   python3-pip && \
+  r-base && \
 #
 # Set python aliases for Python 3.x
 echo 'alias python=python3' >> ~/.bashrc \
