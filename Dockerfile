@@ -39,7 +39,7 @@ apt-get -y install \
   libavformat-dev \
   libswscale-dev \
   python3.8 \
-  python3-pip && \
+  python3-pip \
   r-base && \
 #
 # Set python aliases for Python 3.x
