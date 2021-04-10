@@ -97,7 +97,7 @@ rm -rf $INSTALL_DIR
 # Create a dedicated 'docker' group and user
 RUN groupadd docker && \
   useradd -m docker -g docker -p docker && \
-  chown 0777 /home/docker && \
+  chmod 0777 /home/docker && \
   chgrp docker /usr/local/bin && \
   mkdir -p /home/docker/bin && chown docker /home/docker/bin
 # Use this user by default
