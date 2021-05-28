@@ -62,7 +62,7 @@ Rscript -e 'install.packages("knitr",     repos="https://cloud.r-project.org")' 
 Rscript -e 'install.packages("dplyr",     repos="https://cloud.r-project.org")' && \
 #
 # silence parallel
-parallel --citation --will-cite && \
+yes 'will cite' | parallel --citation && \
 #
 # Clear installation data
 apt-get clean && rm -r /var/cache/
