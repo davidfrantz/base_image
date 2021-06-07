@@ -4,7 +4,7 @@
 #                         David Frantz
 #                         Fabian Lehmann
 
-FROM ubuntu:18.04 as builder
+FROM ubuntu:20.04 as builder
 
 # disable interactive frontends
 ENV DEBIAN_FRONTEND=noninteractive 
@@ -27,7 +27,7 @@ apt-get -y install \
   build-essential \
   libgdal-dev \
   gdal-bin \
-  python-gdal \ 
+  #python-gdal \ 
   libarmadillo-dev \
   libfltk1.3-dev \
   libgsl0-dev \
@@ -62,7 +62,7 @@ Rscript -e 'install.packages("knitr",     repos="https://cloud.r-project.org")' 
 Rscript -e 'install.packages("dplyr",     repos="https://cloud.r-project.org")' && \
 #
 # silence parallel
-yes 'will cite' | parallel --citation && \
+#yes 'will cite' | parallel --citation && \
 #
 # Clear installation data
 apt-get clean && rm -r /var/cache/
