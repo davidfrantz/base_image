@@ -60,7 +60,7 @@ Rscript -e 'install.packages("plotly",    repos="https://cloud.r-project.org")' 
 Rscript -e 'install.packages("stringi",   repos="https://cloud.r-project.org")' && \
 Rscript -e 'install.packages("knitr",     repos="https://cloud.r-project.org")' && \
 Rscript -e 'install.packages("dplyr",     repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("raster",     repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("raster",    repos="https://cloud.r-project.org")' && \
 #
 # silence parallel
 #yes 'will cite' | parallel --citation && \
