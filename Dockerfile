@@ -52,7 +52,7 @@ echo 'alias python=python3' >> ~/.bashrc \
   && . ~/.bashrc && \
 # NumPy is needed for OpenCV, gsutil for Google downloads
 pip3 install --no-cache-dir --upgrade pip && \
-pip3 install --no-cache-dir numpy==1.18.1 gsutil scipy && \
+pip3 install --no-cache-dir numpy==1.18.1 gsutil scipy==1.6.0 && \
 #
 # Install R packages
 Rscript -e 'install.packages("rmarkdown", repos="https://cloud.r-project.org")' && \
