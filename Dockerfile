@@ -10,7 +10,7 @@ FROM ubuntu:20.04 as builder
 ENV DEBIAN_FRONTEND=noninteractive 
 
 # Refresh package list & upgrade existing packages 
-RUN apt-get -y update && apt-get -y upgrade && \ 
+RUN apt-get -y update && apt-get -y upgrade && \
 #
 # Add PPA for Python 3.x and R 4.0
 apt -y install software-properties-common dirmngr && \
@@ -44,7 +44,8 @@ apt-get -y install \
   python3.8 \
   python3-pip \
   pandoc \
-  r-base && \
+  r-base \
+  aria2 && \
 #
 # Set python aliases for Python 3.x
 echo 'alias python=python3' >> ~/.bashrc \
@@ -52,7 +53,7 @@ echo 'alias python=python3' >> ~/.bashrc \
   && . ~/.bashrc && \
 # NumPy is needed for OpenCV, gsutil for Google downloads
 pip3 install --no-cache-dir --upgrade pip && \
-pip3 install --no-cache-dir numpy==1.18.1 gsutil scipy==1.6.0 && \
+pip3 install --no-cache-dir numpy==1.18.1 gsutil scipy==1.6.0 git+https://github.com/ernstste/landsatlinks.git && \
 #
 # Install R packages
 Rscript -e 'install.packages("rmarkdown", repos="https://cloud.r-project.org")' && \
