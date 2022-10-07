@@ -17,4 +17,4 @@ jobs:
         with:
           token: ${{ secrets.DISPATCH }}
           repository: davidfrantz/force
-          event-type: main-dispatch
+          event-type: base-dispatch
