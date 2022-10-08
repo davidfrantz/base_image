@@ -46,14 +46,19 @@ apt-get -y install \
   pandoc \
   r-base \
   aria2 && \
-#
 # Set python aliases for Python 3.x
 echo 'alias python=python3' >> ~/.bashrc \
   && echo 'alias pip=pip3' >> ~/.bashrc \
   && . ~/.bashrc && \
-# NumPy is needed for OpenCV, gsutil for Google downloads
+#
+# NumPy is needed for OpenCV, gsutil for level1-csd, landsatlinks for level1-landsat (requires gdal/requests/tqdm)
 pip3 install --no-cache-dir --upgrade pip && \
-pip3 install --no-cache-dir numpy==1.18.1 gsutil scipy==1.6.0 git+https://github.com/ernstste/landsatlinks.git && \
+pip3 install --no-cache-dir  \
+    numpy==1.18.1  \
+    gsutil \
+    scipy==1.6.0 \
+    gdal==$(gdal-config --version | awk -F'[.]' '{print $1"."$2}') \
+    git+https://github.com/ernstste/landsatlinks.git && \
 #
 # Install R packages
 Rscript -e 'install.packages("rmarkdown", repos="https://cloud.r-project.org")' && \
