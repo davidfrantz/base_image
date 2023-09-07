@@ -2,6 +2,8 @@ name: Docker
 
 on:
   push:
+  repository_dispatch:
+    types: [landsatlinks-dispatch]
 
 env:
   DOCKER_USER: ${{secrets.DOCKER_USER}}
