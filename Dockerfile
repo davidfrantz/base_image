@@ -22,6 +22,7 @@ add-apt-repository -y ppa:deadsnakes/ppa && \
 apt-get -y install \
   wget \
   unzip \
+  dos2unix \
   curl \
   git \
   build-essential \
