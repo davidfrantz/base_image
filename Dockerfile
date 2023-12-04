@@ -62,16 +62,24 @@ pip3 install --no-cache-dir  \
     git+https://github.com/ernstste/landsatlinks.git && \
 #
 # Install R packages
-Rscript -e 'install.packages("rmarkdown", repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("plotly",    repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("stringi",   repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("knitr",     repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("dplyr",     repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("raster",    repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("sp",        repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("rgdal",     repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("snow",      repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("snowfall",  repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("rmarkdown",   repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("plotly",      repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("stringi",     repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("stringr",     repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("tm",          repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("knitr",       repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("dplyr",       repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("bib2df",      repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("wordcloud",   repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("network",     repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("intergraph",  repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("igraph",      repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("htmlwidgets", repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("raster",      repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("sp",          repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("rgdal",       repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("snow",        repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("snowfall",    repos="https://cloud.r-project.org")' && \
 #
 # Clear installation data
 apt-get clean && rm -r /var/cache/
