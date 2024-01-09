@@ -71,6 +71,7 @@ Rscript -e 'install.packages("knitr",       repos="https://cloud.r-project.org")
 Rscript -e 'install.packages("dplyr",       repos="https://cloud.r-project.org")' && \
 Rscript -e 'install.packages("bib2df",      repos="https://cloud.r-project.org")' && \
 Rscript -e 'install.packages("wordcloud",   repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("wordcloud2",   repos="https://cloud.r-project.org")' && \
 Rscript -e 'install.packages("network",     repos="https://cloud.r-project.org")' && \
 Rscript -e 'install.packages("intergraph",  repos="https://cloud.r-project.org")' && \
 Rscript -e 'install.packages("igraph",      repos="https://cloud.r-project.org")' && \
