@@ -81,6 +81,7 @@ Rscript -e 'install.packages("sp",          repos="https://cloud.r-project.org")
 Rscript -e 'install.packages("rgdal",       repos="https://cloud.r-project.org")' && \
 Rscript -e 'install.packages("snow",        repos="https://cloud.r-project.org")' && \
 Rscript -e 'install.packages("snowfall",    repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("getopt",      repos="https://cloud.r-project.org")' && \
 #
 # Clear installation data
 apt-get clean && rm -r /var/cache/
