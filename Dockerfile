@@ -79,6 +79,7 @@ Rscript -e 'install.packages("htmlwidgets", repos="https://cloud.r-project.org")
 Rscript -e 'install.packages("raster",      repos="https://cloud.r-project.org")' && \
 Rscript -e 'install.packages("sp",          repos="https://cloud.r-project.org")' && \
 Rscript -e 'install.packages("rgdal",       repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("sf",          repos="https://cloud.r-project.org")' && \
 Rscript -e 'install.packages("snow",        repos="https://cloud.r-project.org")' && \
 Rscript -e 'install.packages("snowfall",    repos="https://cloud.r-project.org")' && \
 Rscript -e 'install.packages("getopt",      repos="https://cloud.r-project.org")' && \
