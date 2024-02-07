@@ -45,6 +45,7 @@ apt-get -y install \
   python3.8 \
   python3-pip \
   pandoc \
+  libudunits2-dev \
   r-base \
   aria2 && \
 # Set python aliases for Python 3.x
