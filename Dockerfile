@@ -39,6 +39,7 @@ apt-get -y install \
   cmake \
   libgtk2.0-dev \
   pkg-config \
+  libglpk-dev \
   libavcodec-dev \
   libavformat-dev \
   libswscale-dev \
