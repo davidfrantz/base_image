@@ -97,7 +97,7 @@ ENV INSTALL_DIR /opt/install/src
 RUN mkdir -p $INSTALL_DIR/parallel && cd $INSTALL_DIR/parallel && \
 wget https://ftpmirror.gnu.org/parallel/parallel-20240422.tar.bz2 \
   && tar -xf parallel-20240422.tar.bz2 \
-  && cd parallel-20240422 && \
+  && cd parallel-20240422 \
   && make \
   && make install \
   && make clean && \
