@@ -29,6 +29,9 @@ apt-get -y install \
   libgdal-dev \
   gdal-bin \
   #python-gdal \ 
+  autoconf \
+  autoconf-archive \
+  automake \
   libarmadillo-dev \
   libfltk1.3-dev \
   libgsl0-dev \
@@ -115,12 +118,15 @@ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local .. \
   && make clean && \
 #
 # Build SPLITS from source
-mkdir -p $INSTALL_DIR/splits && \
-cd $INSTALL_DIR/splits && \
-wget http://sebastian-mader.net/wp-content/uploads/2017/11/splits-1.9.tar.gz && \
-tar -xzf splits-1.9.tar.gz && \
-cd $INSTALL_DIR/splits/splits-1.9 && \
-./configure CPPFLAGS="-I /usr/include/gdal" CXXFLAGS=-fpermissive \
+cd $INSTALL_DIR && \
+git clone https://bitbucket.org/smader/splits.git \
+  && cd splits && \
+libtoolize --force \
+  && aclocal \
+  && autoheader \
+  && automake --force-missing --add-missing \
+  && autoconf \
+  && ./configure --disable-gui CPPFLAGS=-I/usr/include/gdal CXXFLAGS=-fpermissive \
   && make \
   && make install \
   && make clean && \
