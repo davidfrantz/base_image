@@ -1,8 +1,9 @@
 # This file builds a Docker base image for its use in other projects
 
-# Copyright (C) 2020-2021 Gergely Padányi-Gulyás (github user fegyi001),
+# Copyright (C) 2020-2024 Gergely Padányi-Gulyás (github user fegyi001),
 #                         David Frantz
 #                         Fabian Lehmann
+#                         Wilfried Weber
 
 FROM ubuntu:20.04 as builder
 
@@ -37,7 +38,6 @@ apt-get -y install \
   libgsl0-dev \
   lockfile-progs \
   rename \
-  #parallel \
   apt-utils \
   cmake \
   libgtk2.0-dev \
@@ -52,6 +52,10 @@ apt-get -y install \
   libudunits2-dev \
   r-base \
   aria2 && \
+  dpkg -r parallel && \
+  wget http://de.archive.ubuntu.com/ubuntu/pool/universe/p/parallel/parallel_20210822+ds-2_all.deb && \
+  dpkg -i parallel_20210822+ds-2_all.deb && \
+  rm parallel_20210822+ds-2_all.deb && \
 # Set python aliases for Python 3.x
 echo 'alias python=python3' >> ~/.bashrc \
   && echo 'alias pip=pip3' >> ~/.bashrc \
@@ -96,18 +100,8 @@ apt-get clean && rm -r /var/cache/
 # Install folder
 ENV INSTALL_DIR /opt/install/src
 
-# Build parallel from source
-RUN mkdir -p $INSTALL_DIR/parallel && cd $INSTALL_DIR/parallel && \
-wget https://ftpmirror.gnu.org/parallel/parallel-20240422.tar.bz2 \
-  && tar -xf parallel-20240422.tar.bz2 \
-  && cd parallel-20240422 && \
-./configure \
-  && make \
-  && make install \
-  && make clean && \
-#
 # Build OpenCV from source
-mkdir -p $INSTALL_DIR/opencv && cd $INSTALL_DIR/opencv && \
+RUN mkdir -p $INSTALL_DIR/opencv && cd $INSTALL_DIR/opencv && \
 wget https://github.com/opencv/opencv/archive/4.1.0.zip \
   && unzip 4.1.0.zip && \
 mkdir -p $INSTALL_DIR/opencv/opencv-4.1.0/build && \
