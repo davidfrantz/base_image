@@ -39,6 +39,7 @@ apt-get -y install \
   lockfile-progs \
   rename \
   apt-utils \
+  sysstat \
   cmake \
   libgtk2.0-dev \
   pkg-config \
