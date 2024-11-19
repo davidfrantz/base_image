@@ -43,6 +43,8 @@ apt-get -y install \
   cmake \
   libgtk2.0-dev \
   pkg-config \
+  libcurl4-openssl-dev \
+  libxml2-dev \
   libglpk-dev \
   libavcodec-dev \
   libavformat-dev \
