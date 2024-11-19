@@ -45,6 +45,7 @@ apt-get -y install \
   pkg-config \
   libcurl4-openssl-dev \
   libxml2-dev \
+  gfortran \
   libglpk-dev \
   libavcodec-dev \
   libavformat-dev \
