@@ -75,31 +75,14 @@ pip3 install --no-cache-dir  \
     git+https://github.com/ernstste/landsatlinks.git && \
 #
 # Install R packages
-Rscript -e 'install.packages("rmarkdown",   repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("plotly",      repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("stringi",     repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("stringr",     repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("tm",          repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("knitr",       repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("dplyr",       repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("bib2df",      repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("wordcloud",   repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("wordcloud2",   repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("network",     repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("intergraph",  repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("igraph",      repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("htmlwidgets", repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("raster",      repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("sp",          repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("rgdal",       repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("units",       repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("sf",          repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("snow",        repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("snowfall",    repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("getopt",      repos="https://cloud.r-project.org")' && \
+Rscript -e "install.packages(c('sp', 'https://cran.r-project.org/src/contrib/Archive/rgdal/rgdal_1.6-7.tar.gz'), repos='https://cloud.r-project.org', Ncpus=4)" && \
+Rscript -e "install.packages('pak', repos='https://r-lib.github.io/p/pak/dev/')" && \
+CORES=$(nproc) && \
+export MAKEFLAGS="-j$CORES" && \
+Rscript -e "pak::pkg_install(c('rmarkdown','plotly', 'stringi', 'stringr', 'tm', 'knitr', 'dplyr', 'bib2df', 'wordcloud', 'wordcloud2', 'network', 'intergraph','igraph', 'htmlwidgets', 'raster', 'units', 'sf', 'snow', 'snowfall', 'getopt'))" && \
 #
 # Clear installation data
-apt-get clean && rm -r /var/cache/
+apt-get clean && rm -r /var/cache/ /root/.cache /tmp/Rtmp*
 
 # Install folder
 ENV INSTALL_DIR /opt/install/src
