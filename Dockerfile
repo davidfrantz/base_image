@@ -14,8 +14,13 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y update && apt-get -y upgrade && \
 #
 # Add PPA for Python 3.x and R 4.0
-apt -y install software-properties-common dirmngr && \
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 && \
+apt-get -y install \
+  ca-certificates \
+  curl \
+  dirmngr \
+  gpg \
+  software-properties-common && \
+curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE298A3A825C0D65DFD57CBB651716619E084DAB9" | gpg --dearmor -o /etc/apt/keyrings/r-project-keyring.gpg && \
 add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -sc)-cran40/" && \
 add-apt-repository -y ppa:deadsnakes/ppa && \
 #
