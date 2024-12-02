@@ -5,7 +5,7 @@
 #                         Fabian Lehmann
 #                         Wilfried Weber
 
-FROM ubuntu:20.04 as builder
+FROM ubuntu:20.04 AS builder
 
 # disable interactive frontends
 ENV DEBIAN_FRONTEND=noninteractive 
@@ -90,7 +90,9 @@ Rscript -e "pak::pkg_install(c('rmarkdown','plotly', 'stringi', 'stringr', 'tm',
 apt-get clean && rm -r /var/cache/ /root/.cache /tmp/Rtmp*
 
 # Install folder
-ENV INSTALL_DIR /opt/install/src
+ENV INSTALL_DIR=/opt/install/src \
+    HOME=/home/docker \
+    PATH="$PATH:/home/docker/bin"
 
 # Build OpenCV from source
 RUN mkdir -p $INSTALL_DIR/opencv && cd $INSTALL_DIR/opencv && \
@@ -130,8 +132,5 @@ RUN groupadd docker && \
   mkdir -p /home/docker/bin && chown docker /home/docker/bin
 # Use this user by default
 USER docker
-
-ENV HOME /home/docker
-ENV PATH "$PATH:/home/docker/bin"
 
 WORKDIR /home/docker
