@@ -9,7 +9,6 @@ env:
   DOCKER_USER: ${{secrets.DOCKER_USER}}
   DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
   IMAGE_NAME: base
-  VERSION: latest
 
 jobs:
   push:
@@ -26,5 +25,11 @@ jobs:
           docker build . --file Dockerfile --tag $IMAGE_NAME
       - name: Push image
         run: |
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          [ "$VERSION" == "main" ] && VERSION=latest
+          [ "$VERSION" == "develop" ] && VERSION=dev
+          echo VERSION=$VERSION
+          echo DOCKER=$DOCKER_USER/$IMAGE_NAME:$VERSION
           docker tag $IMAGE_NAME $DOCKER_USER/$IMAGE_NAME:$VERSION
           docker push $DOCKER_USER/$IMAGE_NAME:$VERSION
