@@ -1,11 +1,11 @@
 # This file builds a Docker base image for its use in other projects
 
-# Copyright (C) 2020-2024 Gergely Padányi-Gulyás (github user fegyi001),
+# Copyright (C) 2020-2025 Gergely Padányi-Gulyás (github user fegyi001),
 #                         David Frantz
 #                         Fabian Lehmann
 #                         Wilfried Weber
 
-FROM ubuntu:24.04 AS builder
+FROM ghcr.io/osgeo/gdal:ubuntu-small-3.11.0 AS builder
 
 # disable interactive frontends
 ENV DEBIAN_FRONTEND=noninteractive 
