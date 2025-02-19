@@ -89,23 +89,8 @@ ENV INSTALL_DIR=/opt/install/src \
     HOME=/home/ubuntu \
     PATH="$PATH:/home/ubuntu/bin"
 
-#
-# Build SPLITS from source
-RUN mkdir -p $INSTALL_DIR && cd $INSTALL_DIR && \
-git clone https://bitbucket.org/smader/splits.git \
-  && cd splits && \
-libtoolize --force \
-  && aclocal \
-  && autoheader \
-  && automake --force-missing --add-missing \
-  && autoconf \
-  && ./configure --disable-gui CPPFLAGS=-I/usr/include/gdal CXXFLAGS=-fpermissive \
-  && make \
-  && make install \
-  && make clean && \
-#
 # Cleanup after successfull builds
-rm -rf $INSTALL_DIR
+RUN rm -rf $INSTALL_DIR
 #RUN apt-get purge -y --auto-remove apt-utils cmake git build-essential software-properties-common
 
 RUN chgrp ubuntu /usr/local/bin && \
