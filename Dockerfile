@@ -72,12 +72,10 @@ Rscript -e "pak::pkg_install(c('rmarkdown','plotly', 'sf', 'snow', 'snowfall', '
 apt-get clean && rm -r /var/cache/ /root/.cache /tmp/Rtmp*
 
 # Install folder
-ENV INSTALL_DIR=/opt/install/src \
-    HOME=/home/ubuntu \
+ENV HOME=/home/ubuntu \
     PATH="$PATH:/home/ubuntu/bin"
 
 # Cleanup after successfull builds
-RUN rm -rf $INSTALL_DIR
 #RUN apt-get purge -y --auto-remove apt-utils cmake git build-essential software-properties-common
 
 RUN chgrp ubuntu /usr/local/bin && \
