@@ -30,39 +30,37 @@ apt-get -y install \
   dos2unix \
   git \
   build-essential \
-  libgdal-dev \
-  autoconf \
-  autoconf-archive \
-  automake \
   libgsl0-dev \
   lockfile-progs \
   rename \
-  apt-utils \
-  sysstat \
-  cmake \
-  libgtk2.0-dev \
-  pkg-config \
+  #apt-utils \
+  #sysstat \
+  #cmake \
+  #libgtk2.0-dev \
+  #pkg-config \
   libcurl4-openssl-dev \
-  libxml2-dev \
-  gfortran \
-  libglpk-dev \
-  libavcodec-dev \
-  libavformat-dev \
+  #libxml2-dev \
+  #gfortran \
+  #libglpk-dev \
+  #libavcodec-dev \
+  #libavformat-dev \
   libopencv-dev \
-  libswscale-dev \
+  #libswscale-dev \
   python3-pip \
   python-is-python3 \
-  pandoc \
+  #pandoc \
   parallel \
-  libudunits2-dev \
+  #libudunits2-dev \
   r-base \
   aria2 && \
 #
 # NumPy is needed for OpenCV, gsutil for level1-csd, landsatlinks for level1-landsat (requires gdal/requests/tqdm)
 pip3 install --break-system-packages --no-cache-dir \
-    numpy==1.26.4  \
+    numpy \ 
+    #==1.26.4  # test latest version
     gsutil \
-    scipy==1.14.1 \
+    scipy \ 
+    #==1.14.1 # test latest version
     gdal==$(gdal-config --version) \
     git+https://github.com/ernstste/landsatlinks.git && \
 #
