@@ -57,8 +57,7 @@ apt-get -y install \
   libavformat-dev \
   libopencv-dev \
   libswscale-dev \
-  python3.12 \
-  python3-pip \
+    python3-pip \
   python-is-python3 \
   pandoc \
   parallel \
