@@ -4,6 +4,7 @@
 #                         David Frantz
 #                         Fabian Lehmann
 #                         Wilfried Weber
+#                         Peter A. Jonsson
 
 FROM ghcr.io/osgeo/gdal:ubuntu-small-3.11.0 AS builder
 
