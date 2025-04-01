@@ -52,24 +52,27 @@ apt-get -y install \
   parallel \
   #libudunits2-dev \
   r-base \
-  aria2 && \
+  aria2 
+  #&& \
 #
 # NumPy is needed for OpenCV, gsutil for level1-csd, landsatlinks for level1-landsat (requires gdal/requests/tqdm)
-pip3 install --break-system-packages --no-cache-dir \
+RUN pip3 install --break-system-packages --no-cache-dir \
     numpy \ 
     #==1.26.4  # test latest version
     gsutil \
     scipy \ 
     #==1.14.1 # test latest version
     gdal==$(gdal-config --version) \
-    git+https://github.com/ernstste/landsatlinks.git && \
+    git+https://github.com/ernstste/landsatlinks.git 
+    #&& \
 #
 # Install R packages
-Rscript -e "install.packages('pak', repos='https://r-lib.github.io/p/pak/dev/')" && \
-Rscript -e "pak::pkg_install(c('rmarkdown','plotly', 'sf', 'snow', 'snowfall', 'getopt'))" && \
+RUN Rscript -e "install.packages('pak', repos='https://r-lib.github.io/p/pak/dev/')" && \
+Rscript -e "pak::pkg_install(c('rmarkdown','plotly', 'sf', 'snow', 'snowfall', 'getopt'))" 
+#&& \
 #
 # Clear installation data
-apt-get clean && rm -r /var/cache/ /root/.cache /tmp/Rtmp*
+RUN apt-get clean && rm -r /var/cache/ /root/.cache /tmp/Rtmp*
 
 # Install folder
 ENV HOME=/home/ubuntu \
