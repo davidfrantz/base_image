@@ -1,4 +1,4 @@
-# This file builds a Docker base image for its use in other projects
+# This file builds a Docker base image for its use in FORCE
 
 # Copyright (C) 2020-2025 Gergely Padányi-Gulyás (github user fegyi001),
 #                         David Frantz
@@ -6,80 +6,104 @@
 #                         Wilfried Weber
 #                         Peter A. Jonsson
 
-FROM ghcr.io/osgeo/gdal:ubuntu-small-3.10.2 AS builder
+FROM ghcr.io/osgeo/gdal:ubuntu-small-3.11.3 AS builder
 
 # disable interactive frontends
 ENV DEBIAN_FRONTEND=noninteractive 
 
+# Install folder for custom builds
+ENV INSTALL_DIR=/opt/install/src
+
 # Refresh package list & upgrade existing packages 
 RUN apt-get -y update && apt-get -y upgrade && \
 #
-# Add PPA for Python 3.x and R 4.0
+# Install wget and add Key for R 4.0
+apt-get -y install \
+  wget && \
+  wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | \
+  tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc && \
+#
+# Install remaining required tools
 apt-get -y install \
   ca-certificates \
-  curl \
   dirmngr \
   gpg \
-  software-properties-common && \
-curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE298A3A825C0D65DFD57CBB651716619E084DAB9" | gpg --dearmor -o /etc/apt/keyrings/r-project-keyring.gpg && \
-add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -sc)-cran40/" && \
-#
-# Install libraries
-apt-get -y install \
-  wget \
+  software-properties-common \
   dos2unix \
   git \
   build-essential \
+  cmake \
   libgsl0-dev \
   lockfile-progs \
   rename \
-  #apt-utils \
-  #sysstat \
-  #cmake \
-  #libgtk2.0-dev \
-  #pkg-config \
   libcurl4-openssl-dev \
-  #libxml2-dev \
-  #gfortran \
-  #libglpk-dev \
-  #libavcodec-dev \
-  #libavformat-dev \
-  libopencv-dev \
-  #libswscale-dev \
   python3-pip \
   python-is-python3 \
-  #pandoc \
   parallel \
-  #libudunits2-dev \
   r-base \
-  aria2 
-  #&& \
+  aria2 && \
 #
+# Install Python packages
 # NumPy is needed for OpenCV, gsutil for level1-csd, landsatlinks for level1-landsat (requires gdal/requests/tqdm)
-RUN pip3 install --break-system-packages --no-cache-dir \
-    numpy \ 
-    #==1.26.4  # test latest version
+#==1.26.4  # test latest version
+#==1.14.1 # test latest version
+pip3 install --break-system-packages --no-cache-dir \
+    numpy \
     gsutil \
-    scipy \ 
-    #==1.14.1 # test latest version
+    scipy \
     gdal==$(gdal-config --version) \
-    git+https://github.com/ernstste/landsatlinks.git 
-    #&& \
+    git+https://github.com/ernstste/landsatlinks.git && \
 #
 # Install R packages
-RUN Rscript -e "install.packages('pak', repos='https://r-lib.github.io/p/pak/dev/')" && \
-Rscript -e "pak::pkg_install(c('rmarkdown','plotly', 'sf', 'snow', 'snowfall', 'getopt'))" 
-#&& \
+Rscript -e 'install.packages("rmarkdown",   repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("plotly",      repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("sf",          repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("snow",        repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("snowfall",    repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("getopt",      repos="https://cloud.r-project.org")' && \
 #
-# Clear installation data
-RUN apt-get clean && rm -r /var/cache/ /root/.cache /tmp/Rtmp*
+# Build OpenCV from source, only required parts
+mkdir -p $INSTALL_DIR/opencv && cd $INSTALL_DIR/opencv && \
+wget https://github.com/opencv/opencv/archive/4.12.0.zip \
+  && unzip 4.12.0.zip && \
+mkdir -p $INSTALL_DIR/opencv/opencv-4.12.0/build && \
+cd $INSTALL_DIR/opencv/opencv-4.12.0/build && \
+cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=/usr/local \
+  -DBUILD_TESTS=OFF \
+  -DBUILD_PERF_TESTS=OFF \
+  -DBUILD_EXAMPLES=OFF \
+  -DBUILD_LIST=ml,imgproc\
+  -DWITH_GTK=OFF \
+  -DWITH_V4L=OFF \
+  -DWITH_ADE=OFF \
+  -DWITH_PNG=OFF \
+  -DWITH_JPEG=OFF \
+  -DWITH_TIFF=OFF \
+  -DWITH_WEBP=OFF \
+  -DWITH_OPENJPEG=OFF \
+  -DWITH_JASPER=OFF \
+  -DWITH_OPENEXR=OFF \
+  -DWITH_IMGCODEC_HDR=OFF \
+  -DWITH_IMGCODEC_SUNRASTER=OFF \
+  -DWITH_IMGCODEC_PFM=OFF \
+  -DWITH_IMGCODEC_PXM=OFF \
+  -DWITH_IMGCODEC_GIF=OFF \
+  -DOPENCV_GENERATE_PKGCONFIG=ON \
+  .. \
+  && make -j7 \
+  && make install \
+  && make clean && \
+#
+# Cleanup after successfull builds
+cd && rm -rf $INSTALL_DIR && \
+apt-get clean && \
+rm -r /var/cache/ /var/lib/apt/lists/*
 
-# Install folder
+# De-sudo this image
 ENV HOME=/home/ubuntu \
     PATH="$PATH:/home/ubuntu/bin"
-
-# Cleanup after successfull builds
-#RUN apt-get purge -y --auto-remove apt-utils cmake git build-essential software-properties-common
 
 RUN chgrp ubuntu /usr/local/bin && \
   install -d -o ubuntu -g ubuntu -m 755 /home/ubuntu/bin
