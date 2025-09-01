@@ -99,14 +99,14 @@ cmake \
 # Cleanup after successfull builds
 cd && rm -rf $INSTALL_DIR && \
 apt-get clean && \
-rm -r /var/cache/ /var/lib/apt/lists/*
+rm -r /var/cache/ /var/lib/apt/lists/* && \
+#
+# set permissions
+chmod -R 0755 /home/ubuntu
 
 # De-sudo this image
 ENV HOME=/home/ubuntu \
     PATH="$PATH:/home/ubuntu/bin"
-
-RUN chgrp ubuntu /usr/local/bin && \
-  install -d -o ubuntu -g ubuntu -m 755 /home/ubuntu/bin
 
 # Use this user by default
 USER ubuntu
