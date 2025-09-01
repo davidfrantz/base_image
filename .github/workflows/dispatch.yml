@@ -2,8 +2,6 @@
 name: dispatch to FORCE
 
 on:
-  push:
-    branches: [ main ]
   workflow_run:
     workflows: [Docker]
     types: [completed]
