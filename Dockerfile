@@ -34,6 +34,7 @@ apt-get -y install \
   build-essential \
   cmake \
   libgsl0-dev \
+  libjansson-dev \
   lockfile-progs \
   rename \
   libcurl4-openssl-dev \
