@@ -103,7 +103,7 @@ apt-get clean && \
 rm -r /var/cache/ /var/lib/apt/lists/* && \
 #
 # set permissions
-chmod -R 0755 /home/ubuntu
+chmod -R 0777 /home/ubuntu
 
 # De-sudo this image
 ENV HOME=/home/ubuntu \
