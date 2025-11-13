@@ -35,6 +35,8 @@ apt-get -y install \
   cmake \
   libgsl0-dev \
   libjansson-dev \
+  libssl-dev \
+  libudunits2-dev \
   lockfile-progs \
   rename \
   libcurl4-openssl-dev \
