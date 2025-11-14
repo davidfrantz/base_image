@@ -37,6 +37,10 @@ apt-get -y install \
   libjansson-dev \
   libssl-dev \
   libudunits2-dev \
+  libproj-dev \
+  libgdal-dev \
+  libsqlite3-dev \
+  libgeos-dev \
   lockfile-progs \
   rename \
   libcurl4-openssl-dev \
@@ -58,12 +62,12 @@ pip3 install --break-system-packages --no-cache-dir \
     git+https://github.com/ernstste/landsatlinks.git && \
 #
 # Install R packages
-Rscript -e 'install.packages("rmarkdown",   repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("plotly",      repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("sf",          repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("snow",        repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("snowfall",    repos="https://cloud.r-project.org")' && \
-Rscript -e 'install.packages("getopt",      repos="https://cloud.r-project.org")' && \
+Rscript -e 'install.packages("rmarkdown", repos="https://cloud.r-project.org"); if (!library(rmarkdown, logical.return=T)) quit(save="no", status=10)' && \
+Rscript -e 'install.packages("plotly", repos="https://cloud.r-project.org"); if (!library(plotly, logical.return=T)) quit(save="no", status=10)' && \
+Rscript -e 'install.packages("sf", repos="https://cloud.r-project.org"); if (!library(sf, logical.return=T)) quit(save="no", status=10)' && \
+Rscript -e 'install.packages("snow", repos="https://cloud.r-project.org"); if (!library(snow, logical.return=T)) quit(save="no", status=10)' && \
+Rscript -e 'install.packages("snowfall", repos="https://cloud.r-project.org"); if (!library(snowfall, logical.return=T)) quit(save="no", status=10)' && \
+Rscript -e 'install.packages("getopt", repos="https://cloud.r-project.org"); if (!library(getopt, logical.return=T)) quit(save="no", status=10)' && \
 #
 # Build OpenCV from source, only required parts
 mkdir -p $INSTALL_DIR/opencv && cd $INSTALL_DIR/opencv && \
