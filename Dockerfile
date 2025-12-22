@@ -109,7 +109,7 @@ cmake \
   -DWITH_IMGCODEC_GIF=OFF \
   -DOPENCV_GENERATE_PKGCONFIG=ON \
   .. \
-  && make -j7 \
+  && make -j$(nproc) \
   && make install \
   && make clean && \
 #
