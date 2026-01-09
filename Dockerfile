@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # This file builds a Docker base image for its use in FORCE
 
 # Copyright (C) 2020-2025 Gergely Padányi-Gulyás (github user fegyi001),
@@ -6,7 +7,17 @@
 #                         Wilfried Weber
 #                         Peter A. Jonsson
 
-FROM ghcr.io/osgeo/gdal:ubuntu-small-3.11.3 AS builder
+# Run "docker buildx imagetools inspect ghcr.io/osgeo/gdal:ubuntu-small-3.11.3"
+# to get the sha256 of the manifest list so image is multi-arch.
+FROM ghcr.io/osgeo/gdal:ubuntu-small-3.11.3@sha256:a7c6f68b9868420861be6dd51873ac464fc587ae3b6206b546408d67d697328e AS internal_base
+
+# Keep deb packages in Docker cache and increase the number of retries
+# when downloading the packages.
+RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
+    echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache && \
+    echo 'Acquire::Retries "10";' > /etc/apt/apt.conf.d/80-retries
+
+FROM internal_base AS builder
 
 # disable interactive frontends
 ENV DEBIAN_FRONTEND=noninteractive 
@@ -14,8 +25,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install folder for custom builds
 ENV INSTALL_DIR=/opt/install/src
 
-# Refresh package list & upgrade existing packages 
-RUN apt-get -y update && apt-get -y upgrade && \
+# Refresh package list & upgrade existing packages
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+  apt-get -y update && apt-get -y upgrade && \
 #
 # Install wget and add Key for R 4.0
 apt-get -y install \
@@ -48,13 +61,13 @@ apt-get -y install \
   python-is-python3 \
   parallel \
   r-base \
-  aria2 && \
-#
+  aria2
+
 # Install Python packages
 # NumPy is needed for OpenCV, gsutil for level1-csd, landsatlinks for level1-landsat (requires gdal/requests/tqdm)
 #==1.26.4  # test latest version
 #==1.14.1 # test latest version
-pip3 install --break-system-packages --no-cache-dir \
+RUN pip3 install --break-system-packages --no-cache-dir \
     numpy \
     gsutil \
     scipy \
@@ -99,14 +112,12 @@ cmake \
   -DWITH_IMGCODEC_GIF=OFF \
   -DOPENCV_GENERATE_PKGCONFIG=ON \
   .. \
-  && make -j7 \
+  && make -j$(nproc) \
   && make install \
   && make clean && \
 #
 # Cleanup after successfull builds
 cd && rm -rf $INSTALL_DIR && \
-apt-get clean && \
-rm -r /var/cache/ /var/lib/apt/lists/* && \
 #
 # set permissions
 chmod -R 0777 /home/ubuntu
