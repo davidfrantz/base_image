@@ -70,7 +70,6 @@ RUN pip3 install --break-system-packages --no-cache-dir \
     numpy \
     gsutil \
     scipy \
-    gdal==$(gdal-config --version) \
     git+https://github.com/ernstste/landsatlinks.git && \
 #
 # Install R packages
