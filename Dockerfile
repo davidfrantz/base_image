@@ -32,14 +32,7 @@ COPY --chown=root:root --link remap-user.sh /usr/local/bin/remap-user.sh
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt-get -y update && apt-get -y upgrade && \
-#
-# Install wget and add Key for R 4.0
-apt-get -y install \
-  wget && \
-  wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | \
-  tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc && \
-#
-# Install remaining required tools
+# Install required tools.
 apt-get -y install \
   ca-certificates \
   dirmngr \
@@ -65,6 +58,7 @@ apt-get -y install \
   python-is-python3 \
   parallel \
   r-base \
+  wget \
   tini \
   aria2
 
