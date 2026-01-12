@@ -26,7 +26,10 @@ jobs:
           docker build . --file Dockerfile --tag $IMAGE_NAME
       - name: Push image
         run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Fetch all tags
+          git fetch --tags
+          # Get the latest tag reachable from HEAD
+          VERSION=$(git describe --tags --abbrev=0)
           echo VERSION=$VERSION
           echo DOCKER=$DOCKER_USER/$IMAGE_NAME:$VERSION
           docker tag $IMAGE_NAME $DOCKER_USER/$IMAGE_NAME:$VERSION
