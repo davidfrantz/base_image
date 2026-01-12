@@ -1,0 +1,29 @@
+name: Git-Tag
+
+on:
+  push:
+  repository_dispatch:
+    types: [landsatlinks-dispatch]
+
+jobs:
+  tagging:
+    name: Create and Push Tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0 # fetch all history for tags
+      - name: Set up git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Create and Push Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          GDAL_VERSION=$(grep -oP 'FROM ghcr.io/osgeo/gdal:ubuntu-small-\K[0-9.]+(?=@sha256)' Dockerfile)
+          DATE_TIME=$(date +'%Y%m%d%H%M')
+          TAG_NAME="1.${DATE_TIME}.${GDAL_VERSION}"
+          git tag "$TAG_NAME"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} "$TAG_NAME"
