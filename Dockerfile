@@ -25,6 +25,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install folder for custom builds
 ENV INSTALL_DIR=/opt/install/src
 
+# Add login-script for UID/GID-remapping.
+COPY --chown=root:root --link remap-user.sh /usr/local/bin/remap-user.sh
+
 # Refresh package list & upgrade existing packages
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -46,6 +49,7 @@ apt-get -y install \
   git \
   build-essential \
   cmake \
+  gosu \
   libgsl0-dev \
   libjansson-dev \
   libssl-dev \
@@ -61,6 +65,7 @@ apt-get -y install \
   python-is-python3 \
   parallel \
   r-base \
+  tini \
   aria2
 
 # Install Python packages
@@ -130,3 +135,7 @@ ENV HOME=/home/ubuntu \
 USER ubuntu
 
 WORKDIR /home/ubuntu
+
+USER root
+
+ENTRYPOINT ["/usr/local/bin/remap-user.sh"]
