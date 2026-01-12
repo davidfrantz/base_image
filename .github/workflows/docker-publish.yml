@@ -1,9 +1,9 @@
 name: Docker
 
 on:
-  push:
-  repository_dispatch:
-    types: [landsatlinks-dispatch]
+  workflow_run:
+    workflows: [Git-Tag]
+    types: [completed]
 
 env:
   DOCKER_USER: ${{secrets.DOCKER_USER}}
@@ -20,14 +20,20 @@ jobs:
       - name: Docker login
         run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
       - name: Build image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+        run: |
+          SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
+          export SOURCE_DATE_EPOCH
+          docker build . --file Dockerfile --tag $IMAGE_NAME
       - name: Push image
         run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          [ "$VERSION" == "main" ] && VERSION=latest
-          [ "$VERSION" == "develop" ] && VERSION=dev
+          # Fetch all tags
+          git fetch --tags
+          # Get the latest tag reachable from HEAD
+          VERSION=$(git describe --tags --abbrev=0)
           echo VERSION=$VERSION
           echo DOCKER=$DOCKER_USER/$IMAGE_NAME:$VERSION
           docker tag $IMAGE_NAME $DOCKER_USER/$IMAGE_NAME:$VERSION
           docker push $DOCKER_USER/$IMAGE_NAME:$VERSION
+          # Also tag and push as latest
+          docker tag $IMAGE_NAME $DOCKER_USER/$IMAGE_NAME:latest
+          docker push $DOCKER_USER/$IMAGE_NAME:latest
