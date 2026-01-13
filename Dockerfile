@@ -115,14 +115,10 @@ cmake \
   && make clean && \
 #
 # Cleanup after successfull builds
-cd && rm -rf $INSTALL_DIR && \
-#
-# set permissions
-chmod -R 0777 /home/ubuntu
+cd && rm -rf $INSTALL_DIR
 
 # De-sudo this image
-ENV HOME=/home/ubuntu \
-    PATH="$PATH:/home/ubuntu/bin"
+ENV HOME=/home/ubuntu
 
 # Use this user by default
 USER ubuntu
