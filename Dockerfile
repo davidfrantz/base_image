@@ -35,6 +35,7 @@ apt-get -y update && apt-get -y upgrade && \
 # Install required tools.
 apt-get -y install \
   ca-certificates \
+  ccache \
   dirmngr \
   gpg \
   software-properties-common \
@@ -70,9 +71,15 @@ RUN pip3 install --break-system-packages --no-cache-dir \
     numpy \
     gsutil \
     scipy \
-    git+https://github.com/ernstste/landsatlinks.git && \
-#
-# Install R packages
+    git+https://github.com/ernstste/landsatlinks.git
+
+# Install R packages.
+# Ccache size set from "ccache -s -v" after built from an empty cache.
+# Other ccache settings from https://dirk.eddelbuettel.com/blog/2017/11/27/.
+RUN --mount=type=cache,id=force-base-r,target=/root/.cache \
+mkdir -p $HOME/.R $HOME/.config/ccache && \
+echo -n "CCACHE=ccache\nCC=\$(CCACHE) gcc\nCXX=\$(CCACHE) g++\nCXX11=\$(CCACHE) g++\nCXX14=\$(CCACHE) g++\nCXX17=\$(CCACHE) g++\nFC=\$(CCACHE) gfortran\nF77=\$(CCACHE) gfortran\n" > $HOME/.R/Makevars && \
+echo -n "max_size = 200M\nsloppiness = include_file_ctime\nhash_dir = false\n" > $HOME/.config/ccache/ccache.conf && \
 Rscript -e 'install.packages("rmarkdown", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(rmarkdown, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("plotly", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(plotly, logical.return=T)) quit(save="no", status=10)' && \
 # sf: gdal dependency issues, disabled for now
@@ -80,6 +87,7 @@ Rscript -e 'install.packages("plotly", Ncpus = parallel::detectCores(), repos="h
 Rscript -e 'install.packages("snow", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(snow, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("snowfall", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(snowfall, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("getopt", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(getopt, logical.return=T)) quit(save="no", status=10)' && \
+rm -rf $HOME/.R $HOME/.config/ccache && \
 #
 # Build OpenCV from source, only required parts
 mkdir -p $INSTALL_DIR/opencv && cd $INSTALL_DIR/opencv && \
