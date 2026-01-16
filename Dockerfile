@@ -93,7 +93,7 @@ rm -rf $HOME/.R $HOME/.config/ccache && \
 # Build OpenCV from source, only required parts
 mkdir -p $INSTALL_DIR/opencv && cd $INSTALL_DIR/opencv && \
 curl -LO -fsS https://github.com/opencv/opencv/archive/4.12.0.zip \
-  && unzip 4.12.0.zip && \
+  && unzip -q 4.12.0.zip && \
 mkdir -p $INSTALL_DIR/opencv/opencv-4.12.0/build && \
 cd $INSTALL_DIR/opencv/opencv-4.12.0/build && \
 cmake \
