@@ -19,8 +19,6 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
 
 FROM internal_base AS builder
 
-# disable interactive frontends
-ENV DEBIAN_FRONTEND=noninteractive 
 
 # Install folder for custom builds
 ENV INSTALL_DIR=/opt/install/src
@@ -31,10 +29,14 @@ COPY --chown=root:root --link remap-user.sh /usr/local/bin/remap-user.sh
 # Refresh package list & upgrade existing packages
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-  apt-get -y update && apt-get -y upgrade && \
+# Disable interactive frontends.
+export DEBIAN_FRONTEND=noninteractive && \
+apt-get -y update && apt-get -y upgrade && \
 # Install required tools.
 apt-get -y install \
   ca-certificates \
+  ccache \
+  curl \
   dirmngr \
   gpg \
   software-properties-common \
@@ -70,21 +72,35 @@ RUN pip3 install --break-system-packages --no-cache-dir \
     numpy \
     gsutil \
     scipy \
-    git+https://github.com/ernstste/landsatlinks.git && \
-#
-# Install R packages
+    git+https://github.com/ernstste/landsatlinks.git
+
+# Install R packages.
+# Ccache size set from "ccache -s -v" after built from an empty cache.
+# Other ccache settings from https://dirk.eddelbuettel.com/blog/2017/11/27/.
+RUN --mount=type=cache,id=force-base-r,target=/root/.cache \
+mkdir -p $HOME/.R $HOME/.config/ccache && \
+echo -n "CCACHE=ccache\nCC=\$(CCACHE) gcc\nCXX=\$(CCACHE) g++\nCXX11=\$(CCACHE) g++\nCXX14=\$(CCACHE) g++\nCXX17=\$(CCACHE) g++\nFC=\$(CCACHE) gfortran\nF77=\$(CCACHE) gfortran\n" > $HOME/.R/Makevars && \
+echo -n "max_size = 200M\nsloppiness = include_file_ctime\nhash_dir = false\n" > $HOME/.config/ccache/ccache.conf && \
 Rscript -e 'install.packages("rmarkdown", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(rmarkdown, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("plotly", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(plotly, logical.return=T)) quit(save="no", status=10)' && \
+# The s2 package builds abseil as part of its installation, and that takes
+# a long time, so pass MAKEFLAGS so all available cores are used for
+# the abseil build.
+export MAKEFLAGS="-j$(nproc)" && \
+# Do NOT pass Ncpus, that limits the abseil compile to using a single core.
+Rscript -e 'install.packages("s2", repos="https://cloud.r-project.org"); if (!library(s2, logical.return=T)) quit(save="no", status=10)' && \
+unset MAKEFLAGS && \
 # sf: gdal dependency issues, disabled for now
 #Rscript -e 'install.packages("sf", repos="https://cloud.r-project.org"); if (!library(sf, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("snow", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(snow, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("snowfall", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(snowfall, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("getopt", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(getopt, logical.return=T)) quit(save="no", status=10)' && \
+rm -rf $HOME/.R $HOME/.config/ccache && \
 #
 # Build OpenCV from source, only required parts
 mkdir -p $INSTALL_DIR/opencv && cd $INSTALL_DIR/opencv && \
-wget https://github.com/opencv/opencv/archive/4.12.0.zip \
-  && unzip 4.12.0.zip && \
+curl -LO -fsS https://github.com/opencv/opencv/archive/4.12.0.zip \
+  && unzip -q 4.12.0.zip && \
 mkdir -p $INSTALL_DIR/opencv/opencv-4.12.0/build && \
 cd $INSTALL_DIR/opencv/opencv-4.12.0/build && \
 cmake \
