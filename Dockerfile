@@ -83,6 +83,13 @@ echo -n "CCACHE=ccache\nCC=\$(CCACHE) gcc\nCXX=\$(CCACHE) g++\nCXX11=\$(CCACHE) 
 echo -n "max_size = 200M\nsloppiness = include_file_ctime\nhash_dir = false\n" > $HOME/.config/ccache/ccache.conf && \
 Rscript -e 'install.packages("rmarkdown", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(rmarkdown, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("plotly", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(plotly, logical.return=T)) quit(save="no", status=10)' && \
+# The s2 package builds abseil as part of its installation, and that takes
+# a long time, so pass MAKEFLAGS so all available cores are used for
+# the abseil build.
+export MAKEFLAGS="-j$(nproc)" && \
+# Do NOT pass Ncpus, that limits the abseil compile to using a single core.
+Rscript -e 'install.packages("s2", repos="https://cloud.r-project.org"); if (!library(s2, logical.return=T)) quit(save="no", status=10)' && \
+unset MAKEFLAGS && \
 # sf: gdal dependency issues, disabled for now
 #Rscript -e 'install.packages("sf", repos="https://cloud.r-project.org"); if (!library(sf, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("snow", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(snow, logical.return=T)) quit(save="no", status=10)' && \
