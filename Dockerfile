@@ -46,11 +46,11 @@ apt-get -y install \
   libgsl0-dev \
   libjansson-dev \
   libssl-dev \
-  libudunits2-dev \
-  libproj-dev \
-  libgdal-dev \
-  libsqlite3-dev \
-  libgeos-dev \
+#  libudunits2-dev \ required by sf package, but has gdal dependency issues, disabled for now
+#  libproj-dev \     required by sf package, but has gdal dependency issues, disabled for now
+#  libgdal-dev \     required by sf package, but has gdal dependency issues, disabled for now
+#  libsqlite3-dev \  required by sf package, but has gdal dependency issues, disabled for now
+#  libgeos-dev \     required by sf package, but has gdal dependency issues, disabled for now
   lockfile-progs \
   rename \
   libcurl4-openssl-dev \
@@ -75,7 +75,8 @@ RUN pip3 install --break-system-packages --no-cache-dir \
 # Install R packages
 Rscript -e 'install.packages("rmarkdown", repos="https://cloud.r-project.org"); if (!library(rmarkdown, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("plotly", repos="https://cloud.r-project.org"); if (!library(plotly, logical.return=T)) quit(save="no", status=10)' && \
-Rscript -e 'install.packages("sf", repos="https://cloud.r-project.org"); if (!library(sf, logical.return=T)) quit(save="no", status=10)' && \
+# sf: gdal dependency issues, disabled for now
+#Rscript -e 'install.packages("sf", repos="https://cloud.r-project.org"); if (!library(sf, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("snow", repos="https://cloud.r-project.org"); if (!library(snow, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("snowfall", repos="https://cloud.r-project.org"); if (!library(snowfall, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("getopt", repos="https://cloud.r-project.org"); if (!library(getopt, logical.return=T)) quit(save="no", status=10)' && \
