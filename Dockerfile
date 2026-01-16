@@ -19,8 +19,6 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
 
 FROM internal_base AS builder
 
-# disable interactive frontends
-ENV DEBIAN_FRONTEND=noninteractive 
 
 # Install folder for custom builds
 ENV INSTALL_DIR=/opt/install/src
@@ -31,7 +29,9 @@ COPY --chown=root:root --link remap-user.sh /usr/local/bin/remap-user.sh
 # Refresh package list & upgrade existing packages
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-  apt-get -y update && apt-get -y upgrade && \
+# Disable interactive frontends.
+export DEBIAN_FRONTEND=noninteractive && \
+apt-get -y update && apt-get -y upgrade && \
 # Install required tools.
 apt-get -y install \
   ca-certificates \
