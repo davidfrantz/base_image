@@ -17,15 +17,6 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache && \
     echo 'Acquire::Retries "10";' > /etc/apt/apt.conf.d/80-retries
 
-FROM internal_base AS builder
-
-
-# Install folder for custom builds
-ENV INSTALL_DIR=/opt/install/src
-
-# Add login-script for UID/GID-remapping.
-COPY --chown=root:root --link remap-user.sh /usr/local/bin/remap-user.sh
-
 # Refresh package list & upgrade existing packages
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -64,6 +55,15 @@ apt-get -y install \
   wget \
   tini \
   aria2
+
+FROM internal_base AS builder
+
+
+# Install folder for custom builds
+ENV INSTALL_DIR=/opt/install/src
+
+# Add login-script for UID/GID-remapping.
+COPY --chown=root:root --link remap-user.sh /usr/local/bin/remap-user.sh
 
 # Install Python packages
 # NumPy is needed for OpenCV, gsutil for level1-csd, landsatlinks for level1-landsat (requires gdal/requests/tqdm)
