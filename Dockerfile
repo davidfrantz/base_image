@@ -57,8 +57,14 @@ apt-get -y install \
 
 FROM internal_base AS opencv_builder
 
+ARG OPENCV=https://github.com/opencv/opencv/archive/4.12.0.zip
+
 # Install folder for custom builds.
 ENV INSTALL_DIR=/opt/install/src
+
+RUN mkdir -p $INSTALL_DIR/opencv
+
+ADD --checksum=sha256:fa3faf7581f1fa943c9e670cf57dd6ba1c5b4178f363a188a2c8bff1eb28b7e4 --chown=root:root --chmod=644 --link $OPENCV $INSTALL_DIR/opencv
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -66,15 +72,13 @@ export DEBIAN_FRONTEND=noninteractive && \
 apt-get -y update && apt-get -y upgrade && \
 apt-get install -y --no-install-recommends \
   ccache \
-  curl \
   ninja-build
 
 # Build OpenCV from source, only include the required parts.
 RUN --mount=type=cache,id=force-base-opencv,target=/root/.cache \
 ccache -M 20M && \
-mkdir -p $INSTALL_DIR/opencv && cd $INSTALL_DIR/opencv && \
-curl -LO -fsS https://github.com/opencv/opencv/archive/4.12.0.zip \
-  && unzip -q 4.12.0.zip && \
+cd $INSTALL_DIR/opencv && \
+unzip -q 4.12.0.zip && \
 mkdir -p $INSTALL_DIR/opencv/opencv-4.12.0/build && \
 cd $INSTALL_DIR/opencv/opencv-4.12.0/build && \
 cmake \
