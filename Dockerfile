@@ -27,7 +27,6 @@ apt-get -y update && apt-get -y upgrade && \
 apt-get -y install \
   ca-certificates \
   ccache \
-  curl \
   dirmngr \
   gpg \
   software-properties-common \
@@ -56,11 +55,57 @@ apt-get -y install \
   tini \
   aria2
 
-FROM internal_base AS builder
+FROM internal_base AS opencv_builder
 
-
-# Install folder for custom builds
+# Install folder for custom builds.
 ENV INSTALL_DIR=/opt/install/src
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+export DEBIAN_FRONTEND=noninteractive && \
+apt-get -y update && apt-get -y upgrade && \
+apt-get install -y --no-install-recommends \
+  ccache \
+  curl \
+  ninja-build
+
+# Build OpenCV from source, only include the required parts.
+RUN --mount=type=cache,id=force-base-opencv,target=/root/.cache \
+ccache -M 20M && \
+mkdir -p $INSTALL_DIR/opencv && cd $INSTALL_DIR/opencv && \
+curl -LO -fsS https://github.com/opencv/opencv/archive/4.12.0.zip \
+  && unzip -q 4.12.0.zip && \
+mkdir -p $INSTALL_DIR/opencv/opencv-4.12.0/build && \
+cd $INSTALL_DIR/opencv/opencv-4.12.0/build && \
+cmake \
+  -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=/usr/local \
+  -DBUILD_TESTS=OFF \
+  -DBUILD_PERF_TESTS=OFF \
+  -DBUILD_EXAMPLES=OFF \
+  -DBUILD_LIST=ml,imgproc\
+  -DWITH_GTK=OFF \
+  -DWITH_V4L=OFF \
+  -DWITH_ADE=OFF \
+  -DWITH_PNG=OFF \
+  -DWITH_JPEG=OFF \
+  -DWITH_TIFF=OFF \
+  -DWITH_WEBP=OFF \
+  -DWITH_OPENJPEG=OFF \
+  -DWITH_JASPER=OFF \
+  -DWITH_OPENEXR=OFF \
+  -DWITH_IMGCODEC_HDR=OFF \
+  -DWITH_IMGCODEC_SUNRASTER=OFF \
+  -DWITH_IMGCODEC_PFM=OFF \
+  -DWITH_IMGCODEC_PXM=OFF \
+  -DWITH_IMGCODEC_GIF=OFF \
+  -DOPENCV_GENERATE_PKGCONFIG=ON \
+  .. \
+  && ninja \
+  && DESTDIR=/build_thirdparty ninja install
+
+FROM internal_base AS builder
 
 # Add login-script for UID/GID-remapping.
 COPY --chown=root:root --link remap-user.sh /usr/local/bin/remap-user.sh
@@ -96,44 +141,9 @@ unset MAKEFLAGS && \
 Rscript -e 'install.packages("snow", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(snow, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("snowfall", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(snowfall, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("getopt", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(getopt, logical.return=T)) quit(save="no", status=10)' && \
-rm -rf $HOME/.R $HOME/.config/ccache && \
-#
-# Build OpenCV from source, only required parts
-mkdir -p $INSTALL_DIR/opencv && cd $INSTALL_DIR/opencv && \
-curl -LO -fsS https://github.com/opencv/opencv/archive/4.12.0.zip \
-  && unzip -q 4.12.0.zip && \
-mkdir -p $INSTALL_DIR/opencv/opencv-4.12.0/build && \
-cd $INSTALL_DIR/opencv/opencv-4.12.0/build && \
-cmake \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX=/usr/local \
-  -DBUILD_TESTS=OFF \
-  -DBUILD_PERF_TESTS=OFF \
-  -DBUILD_EXAMPLES=OFF \
-  -DBUILD_LIST=ml,imgproc\
-  -DWITH_GTK=OFF \
-  -DWITH_V4L=OFF \
-  -DWITH_ADE=OFF \
-  -DWITH_PNG=OFF \
-  -DWITH_JPEG=OFF \
-  -DWITH_TIFF=OFF \
-  -DWITH_WEBP=OFF \
-  -DWITH_OPENJPEG=OFF \
-  -DWITH_JASPER=OFF \
-  -DWITH_OPENEXR=OFF \
-  -DWITH_IMGCODEC_HDR=OFF \
-  -DWITH_IMGCODEC_SUNRASTER=OFF \
-  -DWITH_IMGCODEC_PFM=OFF \
-  -DWITH_IMGCODEC_PXM=OFF \
-  -DWITH_IMGCODEC_GIF=OFF \
-  -DOPENCV_GENERATE_PKGCONFIG=ON \
-  .. \
-  && make -j$(nproc) \
-  && make install \
-  && make clean && \
-#
-# Cleanup after successfull builds
-cd && rm -rf $INSTALL_DIR
+rm -rf $HOME/.R $HOME/.config/ccache
+
+COPY --from=opencv_builder --link  /build_thirdparty/usr/ /usr/
 
 # De-sudo this image
 ENV HOME=/home/ubuntu
