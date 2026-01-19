@@ -91,7 +91,8 @@ export MAKEFLAGS="-j$(nproc)" && \
 export CMAKE_C_COMPILER_LAUNCHER=ccache && \
 export CMAKE_CXX_COMPILER_LAUNCHER=ccache && \
 # Do NOT pass Ncpus, that limits the abseil compile to using a single core.
-Rscript -e 'install.packages("s2", repos="https://cloud.r-project.org"); if (!library(s2, logical.return=T)) quit(save="no", status=10)' && \
+# s2: required by sf which has gdal dependency issues, disable for now.
+#Rscript -e 'install.packages("s2", repos="https://cloud.r-project.org"); if (!library(s2, logical.return=T)) quit(save="no", status=10)' && \
 unset MAKEFLAGS CMAKE_C_COMPILER_LAUNCHER CMAKE_CXX_COMPILER_LAUNCHER && \
 # sf: gdal dependency issues, disabled for now
 #Rscript -e 'install.packages("sf", repos="https://cloud.r-project.org"); if (!library(sf, logical.return=T)) quit(save="no", status=10)' && \
