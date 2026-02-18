@@ -58,6 +58,7 @@ apt-get -y install \
   libcurl4-openssl-dev \
   python3-pip \
   python-is-python3 \
+  pandoc \
   parallel \
   r-base \
   wget \
