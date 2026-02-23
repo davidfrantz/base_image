@@ -1,0 +1,39 @@
+# Upgrade all dependencies in requirements.txt by:
+# docker run -v ./:/files --rm -it $(grep "FROM ghcr" Dockerfile | awk '{print $2}') bash
+# $ apt-get update
+# $ apt-get install -y --no-install-recommends python3-pip git
+# $ pip3 install uv --break-system-packages
+# $ cd /files
+# $ uv pip compile -U pyproject.toml -o requirements.txt --group force
+[project]
+name = "force-base-image-installation"
+version = "0.1.0"
+description = "Installation project for force-base-image-installation"
+requires-python = ">=3.12"
+dependencies = [
+  # Required by level1-csd.
+  "gsutil",
+  # Required by level1-landsat.
+  "landsatlinks @ git+https://github.com/ernstste/landsatlinks.git",
+  # Required by OpenCV.
+  "numpy",
+  "scipy",
+]
+
+# The force dependency group is an internal technicality that avoids
+# reinstalling Python packages we already have from Ubuntu packages.
+# When updating:
+#   GDAL version: update "gdal==<version>" below and run "uv pip compile" as
+#                 described at the top of this file.
+#   Ubuntu version: update the other package versions below and run
+#                   "uv pip compile" as described at the top of this file.
+[dependency-groups]
+force = [
+  # GDAL version must match the FROM line in Dockerfile.
+  "gdal==3.11.3",
+  # Some python3-packages from Ubuntu are installed, keep those versions.
+  "cryptography==41.0.7",
+  "numpy==1.26.4",
+  "pyparsing==3.1.1",
+  "six==1.16.0",
+]
