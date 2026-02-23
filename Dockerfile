@@ -42,7 +42,6 @@ apt-get -y install --no-install-recommends \
   libcurl4-openssl-dev \
   pkgconf \
   python3-dev \
-  python3-pip \
   python-is-python3 \
   pandoc \
   parallel \
@@ -68,7 +67,19 @@ export DEBIAN_FRONTEND=noninteractive && \
 apt-get -y update && apt-get -y upgrade && \
 apt-get install -y --no-install-recommends \
   ccache \
-  ninja-build
+  ninja-build \
+  python3-pip
+
+# Install Python packages
+RUN --mount=type=bind,source=requirements.txt,target=requirements.txt \
+# Abort build with an error if GDAL versions do not match.
+[ "$(grep gdal requirements.txt | awk -F= '{print $3}')" = \
+    "$(gdal-config --version)" ] || \
+ (echo -n "\n\n" && \
+  echo "Image and requirements.txt use different GDAL versions." && \
+  echo -n "\n\n" && \
+  exit 1) && \
+pip3 install --root /build_thirdparty --break-system-packages --no-cache-dir -r requirements.txt
 
 # Build OpenCV from source, only include the required parts.
 RUN --mount=type=cache,id=force-base-opencv,target=/root/.cache \
@@ -109,16 +120,6 @@ FROM internal_base AS builder
 
 # Add login-script for UID/GID-remapping.
 COPY --chown=root:root --link remap-user.sh /usr/local/bin/remap-user.sh
-
-# Install Python packages
-# NumPy is needed for OpenCV, gsutil for level1-csd, landsatlinks for level1-landsat (requires gdal/requests/tqdm)
-#==1.26.4  # test latest version
-#==1.14.1 # test latest version
-RUN pip3 install --break-system-packages --no-cache-dir \
-    numpy \
-    gsutil \
-    scipy \
-    git+https://github.com/ernstste/landsatlinks.git
 
 # Install R packages.
 # Ccache size set from "ccache -s -v" after built from an empty cache.
