@@ -17,15 +17,6 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache && \
     echo 'Acquire::Retries "10";' > /etc/apt/apt.conf.d/80-retries
 
-FROM internal_base AS builder
-
-
-# Install folder for custom builds
-ENV INSTALL_DIR=/opt/install/src
-
-# Add login-script for UID/GID-remapping.
-COPY --chown=root:root --link remap-user.sh /usr/local/bin/remap-user.sh
-
 # Refresh package list & upgrade existing packages
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -36,7 +27,6 @@ apt-get -y update && apt-get -y upgrade && \
 apt-get -y install \
   ca-certificates \
   ccache \
-  curl \
   dirmngr \
   gpg \
   software-properties-common \
@@ -64,6 +54,65 @@ apt-get -y install \
   wget \
   tini \
   aria2
+
+FROM internal_base AS opencv_builder
+
+ARG OPENCV=https://github.com/opencv/opencv/archive/4.12.0.zip
+
+# Install folder for custom builds.
+ENV INSTALL_DIR=/opt/install/src
+
+RUN mkdir -p $INSTALL_DIR/opencv
+
+ADD --checksum=sha256:fa3faf7581f1fa943c9e670cf57dd6ba1c5b4178f363a188a2c8bff1eb28b7e4 --chown=root:root --chmod=644 --link $OPENCV $INSTALL_DIR/opencv
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+export DEBIAN_FRONTEND=noninteractive && \
+apt-get -y update && apt-get -y upgrade && \
+apt-get install -y --no-install-recommends \
+  ccache \
+  ninja-build
+
+# Build OpenCV from source, only include the required parts.
+RUN --mount=type=cache,id=force-base-opencv,target=/root/.cache \
+ccache -M 20M && \
+cd $INSTALL_DIR/opencv && \
+unzip -q 4.12.0.zip && \
+mkdir -p $INSTALL_DIR/opencv/opencv-4.12.0/build && \
+cd $INSTALL_DIR/opencv/opencv-4.12.0/build && \
+cmake \
+  -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=/usr/local \
+  -DBUILD_TESTS=OFF \
+  -DBUILD_PERF_TESTS=OFF \
+  -DBUILD_EXAMPLES=OFF \
+  -DBUILD_LIST=ml,imgproc\
+  -DWITH_GTK=OFF \
+  -DWITH_V4L=OFF \
+  -DWITH_ADE=OFF \
+  -DWITH_PNG=OFF \
+  -DWITH_JPEG=OFF \
+  -DWITH_TIFF=OFF \
+  -DWITH_WEBP=OFF \
+  -DWITH_OPENJPEG=OFF \
+  -DWITH_JASPER=OFF \
+  -DWITH_OPENEXR=OFF \
+  -DWITH_IMGCODEC_HDR=OFF \
+  -DWITH_IMGCODEC_SUNRASTER=OFF \
+  -DWITH_IMGCODEC_PFM=OFF \
+  -DWITH_IMGCODEC_PXM=OFF \
+  -DWITH_IMGCODEC_GIF=OFF \
+  -DOPENCV_GENERATE_PKGCONFIG=ON \
+  .. \
+  && ninja \
+  && DESTDIR=/build_thirdparty ninja install
+
+FROM internal_base AS builder
+
+# Add login-script for UID/GID-remapping.
+COPY --chown=root:root --link remap-user.sh /usr/local/bin/remap-user.sh
 
 # Install Python packages
 # NumPy is needed for OpenCV, gsutil for level1-csd, landsatlinks for level1-landsat (requires gdal/requests/tqdm)
@@ -96,44 +145,9 @@ unset MAKEFLAGS && \
 Rscript -e 'install.packages("snow", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(snow, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("snowfall", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(snowfall, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("getopt", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(getopt, logical.return=T)) quit(save="no", status=10)' && \
-rm -rf $HOME/.R $HOME/.config/ccache && \
-#
-# Build OpenCV from source, only required parts
-mkdir -p $INSTALL_DIR/opencv && cd $INSTALL_DIR/opencv && \
-curl -LO -fsS https://github.com/opencv/opencv/archive/4.12.0.zip \
-  && unzip -q 4.12.0.zip && \
-mkdir -p $INSTALL_DIR/opencv/opencv-4.12.0/build && \
-cd $INSTALL_DIR/opencv/opencv-4.12.0/build && \
-cmake \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX=/usr/local \
-  -DBUILD_TESTS=OFF \
-  -DBUILD_PERF_TESTS=OFF \
-  -DBUILD_EXAMPLES=OFF \
-  -DBUILD_LIST=ml,imgproc\
-  -DWITH_GTK=OFF \
-  -DWITH_V4L=OFF \
-  -DWITH_ADE=OFF \
-  -DWITH_PNG=OFF \
-  -DWITH_JPEG=OFF \
-  -DWITH_TIFF=OFF \
-  -DWITH_WEBP=OFF \
-  -DWITH_OPENJPEG=OFF \
-  -DWITH_JASPER=OFF \
-  -DWITH_OPENEXR=OFF \
-  -DWITH_IMGCODEC_HDR=OFF \
-  -DWITH_IMGCODEC_SUNRASTER=OFF \
-  -DWITH_IMGCODEC_PFM=OFF \
-  -DWITH_IMGCODEC_PXM=OFF \
-  -DWITH_IMGCODEC_GIF=OFF \
-  -DOPENCV_GENERATE_PKGCONFIG=ON \
-  .. \
-  && make -j$(nproc) \
-  && make install \
-  && make clean && \
-#
-# Cleanup after successfull builds
-cd && rm -rf $INSTALL_DIR
+rm -rf $HOME/.R $HOME/.config/ccache
+
+COPY --from=opencv_builder --link  /build_thirdparty/usr/ /usr/
 
 # De-sudo this image
 ENV HOME=/home/ubuntu
