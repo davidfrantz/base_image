@@ -33,7 +33,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 export DEBIAN_FRONTEND=noninteractive && \
 apt-get -y update && apt-get -y upgrade && \
 # Install required tools.
-apt-get -y install \
+apt-get -y install --no-install-recommends \
   ca-certificates \
   ccache \
   curl \
@@ -56,6 +56,8 @@ apt-get -y install \
   lockfile-progs \
   rename \
   libcurl4-openssl-dev \
+  pkgconf \
+  python3-dev \
   python3-pip \
   python-is-python3 \
   pandoc \
