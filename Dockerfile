@@ -74,7 +74,7 @@ RUN pip3 install --break-system-packages --no-cache-dir \
 #
 # Install R packages
 Rscript -e 'install.packages("rmarkdown", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(rmarkdown, logical.return=T)) quit(save="no", status=10)' && \
-Rscript -e 'install.packages("plotly", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(plotly, logical.return=T)) quit(save="no", status=10)' && \
+Rscript -e 'install.packages("echarts4r", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(echarts4r, logical.return=T)) quit(save="no", status=10)' && \
 # sf: gdal dependency issues, disabled for now
 #Rscript -e 'install.packages("sf", repos="https://cloud.r-project.org"); if (!library(sf, logical.return=T)) quit(save="no", status=10)' && \
 Rscript -e 'install.packages("snow", Ncpus = parallel::detectCores(), repos="https://cloud.r-project.org"); if (!library(snow, logical.return=T)) quit(save="no", status=10)' && \
