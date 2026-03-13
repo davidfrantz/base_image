@@ -48,11 +48,6 @@ apt-get -y install \
   libgsl0-dev \
   libjansson-dev \
   libssl-dev \
-#  libudunits2-dev \ required by sf package, but has gdal dependency issues, disabled for now
-#  libproj-dev \     required by sf package, but has gdal dependency issues, disabled for now
-#  libgdal-dev \     required by sf package, but has gdal dependency issues, disabled for now
-#  libsqlite3-dev \  required by sf package, but has gdal dependency issues, disabled for now
-#  libgeos-dev \     required by sf package, but has gdal dependency issues, disabled for now
   lockfile-progs \
   rename \
   libcurl4-openssl-dev \
