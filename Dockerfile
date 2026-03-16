@@ -29,7 +29,6 @@ apt-get -y install \
   ccache \
   dirmngr \
   gpg \
-  software-properties-common \
   dos2unix \
   git \
   build-essential \
