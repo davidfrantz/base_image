@@ -36,19 +36,15 @@ apt-get -y install --no-install-recommends \
   gosu \
   libgsl0-dev \
   libjansson-dev \
-  libssl-dev \
   lockfile-progs \
   rename \
-  libcurl4-openssl-dev \
   pkgconf \
   python3-dev \
   python-is-python3 \
   pandoc \
   parallel \
   r-base \
-  wget \
-  tini \
-  aria2
+  tini
 
 FROM internal_base AS opencv_builder
 
