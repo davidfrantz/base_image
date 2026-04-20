@@ -36,6 +36,7 @@ apt-get -y install --no-install-recommends \
   gosu \
   libgsl0-dev \
   libjansson-dev \
+  libuv1-dev \
   lockfile-progs \
   rename \
   pkgconf \
