@@ -25,26 +25,49 @@ export DEBIAN_FRONTEND=noninteractive && \
 apt-get -y update && apt-get -y upgrade && \
 # Install required tools.
 apt-get -y install --no-install-recommends \
-  ca-certificates \
+  # might not be necessary anymore? not sure why they are here
+  #ca-certificates \
+  #dirmngr \
+  #gpg \
+  # clone/install from git repositories
+  # might not be necessary anymore
+  #git \
+  # speed up building, likely only effective for local builds
   ccache \
-  dirmngr \
-  gpg \
-  dos2unix \
-  git \
+  # GCC compiler etc.
   build-essential \
+  # build requirement for OpenCV
   cmake \
-  gosu \
-  libgsl0-dev \
-  libjansson-dev \
-  libuv1-dev \
-  lockfile-progs \
-  rename \
+  # build requirement for OpenCV
   pkgconf \
+  # not sure
+  gosu \
+  # Numerical library, dynamically linked in FORCE
+  libgsl0-dev \
+  # JSON parsing, dynamically linked in FORCE
+  libjansson-dev \
+  # build requirement for Rmarkdown
+  libuv1-dev \
+  # file locking, used in FORCE's bash scripts
+  lockfile-progs \
+  # file renaming, used in FORCE's bash scripts
+  # might not be necessary anymore
+  rename \
+  # safeguard for Windows EOL files, used in FORCE's bash scripts
+  dos2unix \
+  # force-higher-level UDFs, dynamically linked in FORCE
   python3-dev \
+  # not sure if still necessary
   python-is-python3 \
+  # format conversion, required by Rmarkdown
   pandoc \
-  parallel \
+  # force-higher-level UDFs, dynamically linked in FORCE
+  # standalone force-sample-size script
+  # force-level2-report uses Rmarkdown
   r-base \
+  # used in all multiprocessing programs
+  parallel \
+  # wrap entrypoints calls
   tini
 
 FROM internal_base AS opencv_builder
