@@ -32,15 +32,15 @@ apt-get -y install --no-install-recommends \
   # clone/install from git repositories
   # might not be necessary anymore
   #git \
-  # speed up building, likely only effective for local builds
+  # speed up building, only effective for local builds
   ccache \
   # GCC compiler etc.
   build-essential \
   # build requirement for OpenCV
   cmake \
-  # build requirement for OpenCV
+  # build requirement for OpenCV/FORCE
   pkgconf \
-  # not sure
+  # switching UID/GID inside container (for permissions)
   gosu \
   # Numerical library, dynamically linked in FORCE
   libgsl0-dev \
@@ -67,7 +67,7 @@ apt-get -y install --no-install-recommends \
   r-base \
   # used in all multiprocessing programs
   parallel \
-  # wrap entrypoints calls
+  # reaping of zombie processes
   tini
 
 FROM internal_base AS opencv_builder
