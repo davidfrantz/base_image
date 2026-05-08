@@ -29,8 +29,6 @@ apt-get -y install --no-install-recommends \
   ccache \
   # GCC compiler etc.
   build-essential \
-  # build requirement for OpenCV
-  cmake \
   # build requirement for OpenCV/FORCE
   pkgconf \
   # switching UID/GID inside container (for permissions)
@@ -80,6 +78,8 @@ export DEBIAN_FRONTEND=noninteractive && \
 apt-get -y update && apt-get -y upgrade && \
 apt-get install -y --no-install-recommends \
   ccache \
+  # build requirement for OpenCV
+  cmake \
   ninja-build \
   python3-pip
 
