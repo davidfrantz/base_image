@@ -25,9 +25,6 @@ export DEBIAN_FRONTEND=noninteractive && \
 apt-get -y update && apt-get -y upgrade && \
 # Install required tools.
 apt-get -y install --no-install-recommends \
-  # clone/install from git repositories
-  # might not be necessary anymore
-  #git \
   # speed up building, only effective for local builds
   ccache \
   # GCC compiler etc.
