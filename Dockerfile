@@ -25,22 +25,13 @@ export DEBIAN_FRONTEND=noninteractive && \
 apt-get -y update && apt-get -y upgrade && \
 # Install required tools.
 apt-get -y install --no-install-recommends \
-  # might not be necessary anymore? not sure why they are here
-  #ca-certificates \
-  #dirmngr \
-  #gpg \
-  # clone/install from git repositories
-  # might not be necessary anymore
-  #git \
-  # speed up building, likely only effective for local builds
+  # speed up building, only effective for local builds
   ccache \
   # GCC compiler etc.
   build-essential \
-  # build requirement for OpenCV
-  cmake \
-  # build requirement for OpenCV
+  # build requirement for OpenCV/FORCE
   pkgconf \
-  # not sure
+  # switching UID/GID inside container (for permissions)
   gosu \
   # Numerical library, dynamically linked in FORCE
   libgsl0-dev \
@@ -67,7 +58,7 @@ apt-get -y install --no-install-recommends \
   r-base \
   # used in all multiprocessing programs
   parallel \
-  # wrap entrypoints calls
+  # reaping of zombie processes
   tini
 
 FROM internal_base AS opencv_builder
@@ -87,6 +78,8 @@ export DEBIAN_FRONTEND=noninteractive && \
 apt-get -y update && apt-get -y upgrade && \
 apt-get install -y --no-install-recommends \
   ccache \
+  # build requirement for OpenCV
+  cmake \
   ninja-build \
   python3-pip
 
