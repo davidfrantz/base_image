@@ -176,7 +176,7 @@ FROM internal_base AS builder
 # Add login-script for UID/GID-remapping.
 COPY --chown=root:root --link remap-user.sh /usr/local/bin/remap-user.sh
 
-COPY --from=opencv_builder --link  /usr/local/lib/R/R-4.3/* /usr/local/lib/R/site-library/
+COPY --from=opencv_builder --link  /usr/local/lib/R/R-*/* /usr/local/lib/R/site-library/
 COPY --from=opencv_builder --link  /build_thirdparty/usr/ /usr/
 
 # De-sudo this image
