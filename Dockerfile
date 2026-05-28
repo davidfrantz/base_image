@@ -131,8 +131,9 @@ export RENV_PATHS_LIBRARY=/usr/local/lib/R && \
 export RENV_CONFIG_CACHE_SYMLINKS=FALSE && \
 mkdir -p $HOME/.R $HOME/.config/ccache && \
 echo -n "CCACHE=ccache\nCC=\$(CCACHE) gcc\nCXX=\$(CCACHE) g++\nCXX11=\$(CCACHE) g++\nCXX14=\$(CCACHE) g++\nCXX17=\$(CCACHE) g++\nFC=\$(CCACHE) gfortran\nF77=\$(CCACHE) gfortran\n" > $HOME/.R/Makevars && \
+echo 'MAKEFLAGS = -j$(shell nproc)' >> $HOME/.R/Makevars && \
 echo -n "max_size = 200M\nsloppiness = include_file_ctime\nhash_dir = false\n" > $HOME/.config/ccache/ccache.conf && \
-R -s -e 'options(Ncpus = parallel::detectCores()); renv::restore()' && \
+R -s -e 'renv::restore()' && \
 rm -rf $HOME/.R $HOME/.config/ccache
 
 # Build OpenCV from source, only include the required parts.
