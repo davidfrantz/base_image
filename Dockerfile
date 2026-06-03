@@ -65,6 +65,7 @@ ARG OPENCV=https://github.com/opencv/opencv/archive/4.12.0.zip
 
 # Install folder for custom builds.
 ENV INSTALL_DIR=/opt/install/src
+ENV RENV_PATHS_LIBRARY=/usr/local/lib/R
 
 RUN mkdir -p $INSTALL_DIR/opencv
 
@@ -129,7 +130,6 @@ COPY --link renv/settings.json renv/settings.json
 # Ccache size set from "ccache -s -v" after built from an empty cache.
 # Other ccache settings from https://dirk.eddelbuettel.com/blog/2017/11/27/.
 RUN --mount=type=cache,id=force-base-renv,target=/root/.cache \
-export RENV_PATHS_LIBRARY=/usr/local/lib/R && \
 export RENV_CONFIG_CACHE_SYMLINKS=FALSE && \
 mkdir -p $HOME/.R $HOME/.config/ccache && \
 echo -n "CCACHE=ccache\nCC=\$(CCACHE) gcc\nCXX=\$(CCACHE) g++\nCXX11=\$(CCACHE) g++\nCXX14=\$(CCACHE) g++\nCXX17=\$(CCACHE) g++\nFC=\$(CCACHE) gfortran\nF77=\$(CCACHE) gfortran\n" > $HOME/.R/Makevars && \
@@ -173,12 +173,18 @@ cmake \
   && ninja \
   && DESTDIR=/build_thirdparty ninja install
 
+# Ask R directly for the library path renv actually used, then copy to a
+# stable location that does not encode the R version or platform tuple.
+RUN renv_lib=$(Rscript -e 'cat(.libPaths()[1])') && \
+    mkdir -p /usr/local/lib/R/site-library && \
+    cp -rn "$renv_lib"/. /usr/local/lib/R/site-library/
+
 FROM internal_base AS builder
 
 # Add login-script for UID/GID-remapping.
 COPY --chown=root:root --link remap-user.sh /usr/local/bin/remap-user.sh
 
-COPY --from=opencv_builder --link  /usr/local/lib/R/R-*/* /usr/local/lib/R/site-library/
+COPY --from=opencv_builder --link  /usr/local/lib/R/site-library/ /usr/local/lib/R/site-library/
 COPY --from=opencv_builder --link  /build_thirdparty/usr/ /usr/
 
 # De-sudo this image
