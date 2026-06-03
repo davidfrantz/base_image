@@ -136,7 +136,12 @@ echo -n "CCACHE=ccache\nCC=\$(CCACHE) gcc\nCXX=\$(CCACHE) g++\nCXX11=\$(CCACHE) 
 echo 'MAKEFLAGS = -j$(shell nproc)' >> $HOME/.R/Makevars && \
 echo -n "max_size = 200M\nsloppiness = include_file_ctime\nhash_dir = false\n" > $HOME/.config/ccache/ccache.conf && \
 R -s -e 'renv::restore()' && \
-rm -rf $HOME/.R $HOME/.config/ccache
+rm -rf $HOME/.R $HOME/.config/ccache && \
+# Ask R directly for the library path renv actually used, then copy to a
+# stable location that does not encode the R version or platform tuple.
+renv_lib=$(Rscript -e 'cat(.libPaths()[1])') && \
+mkdir -p /usr/local/lib/R/site-library && \
+cp -rn "$renv_lib"/. /usr/local/lib/R/site-library/
 
 # Build OpenCV from source, only include the required parts.
 RUN --mount=type=cache,id=force-base-opencv,target=/root/.cache \
@@ -172,12 +177,6 @@ cmake \
   .. \
   && ninja \
   && DESTDIR=/build_thirdparty ninja install
-
-# Ask R directly for the library path renv actually used, then copy to a
-# stable location that does not encode the R version or platform tuple.
-RUN renv_lib=$(Rscript -e 'cat(.libPaths()[1])') && \
-    mkdir -p /usr/local/lib/R/site-library && \
-    cp -rn "$renv_lib"/. /usr/local/lib/R/site-library/
 
 FROM internal_base AS builder
 
