@@ -26,7 +26,7 @@ dependencies = [
 [dependency-groups]
 force = [
   # GDAL version must match the FROM line in Dockerfile.
-  "gdal==3.13.0",
+  "gdal==3.13.2",
   # Some python3-packages from Ubuntu are installed, keep those versions.
   "numpy==2.3.5",
 ]
