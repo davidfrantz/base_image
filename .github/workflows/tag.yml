@@ -2,6 +2,8 @@ name: Git-Tag
 
 on:
   push:
+    branches:
+      - main
   repository_dispatch:
     types: [landsatlinks-dispatch]
 
